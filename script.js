@@ -150,3 +150,118 @@ console.log("Semua Tag produk: ", semuaTag)
 // bagian 4.2
 const semuaCmn = productss.flatMap(p => p.reviews.map(r=> r.comment))
 console.log("Semua komen orang: ", semuaCmn)
+
+// bagian 5.1
+const laptopPrices = productss
+    .filter(p => p.category === "laptops")
+    .map(p => p.price);
+const avg = laptopPrices.reduce((a, b) => a + b, 0) / laptopPrices.length;
+console.log("Rata-rata harga dari produk laptop: ", avg)
+
+// bagian 5.2
+function getStatistics(productss) {
+    const prices = productss.map(p => p.price)
+    return {
+        totalProducts : productss.length,
+        averagePrice : prices.reduce((a, b) => a + b, 0)/productss.length,
+        highestPrice : Math.max(...prices),
+        lowestPrice : Math.min(...prices),
+        totalStock : productss.reduce((sum, p) => sum + p.stock, 0),
+        averageRating : productss.reduce((sum, p) => sum + p.rating, 0)/productss.length
+    }
+}
+console.log("Statistik produk: ", getStatistics(productss))
+
+// bagian 6.1
+function linearSearch(array, target) {
+    for (let i = 0; i < array.length; i++) {
+        if (array[i] === target) {
+            return i
+        }
+    }
+    return -1;
+}
+const numbers = [10, 50, 30, 15, 60, 95]
+console.log("Indeks dengan angka 10", linearSearch(numbers, 10))
+
+// Latihan 6.2
+function linearId(productss, targetId) {
+    for (let i = 0; i < productss.length; i++) {
+        if (products[i].id === targetId) {
+            return i
+        }
+    }
+    return -1
+}
+
+console.log("Indeks produk dengan ID 2: ", linearId(productss, 2));
+
+// latihan 7.1
+function binarySearch(arr, target) {
+    let left = 0;
+    let right = arr.length - 1;
+    while (left <= right) {
+    const mid = Math.floor((left + right) / 2);
+    if (arr[mid] === target) return mid;
+    if (arr[mid] < target) left = mid + 1;
+    else right = mid - 1;
+    }
+    return -1;
+}
+console.log("Binary search: ",binarySearch(numbers, 60))
+
+// latihan 7.2
+const sortedProducts = [...productss].sort((a, b) => a.price - b.price)
+function binaryPrice(sortedArray, targetPrice) {
+    let left = 0;
+    let right = sortedArray.length - 1
+
+    while (left <= right) {
+        const mid = Math.floor((left + right) / 2)
+        
+        if (sortedArray[mid].price === targetPrice) {
+            return mid
+        }
+        
+        if (sortedArray[mid].price < targetPrice) {
+            left = mid + 1
+        } else {
+            right = mid - 1
+        }
+    }
+    
+    return -1
+}
+console.log("Daftar produk urut:", sortedProducts)
+console.log("Indeks produk dengan harga 800:", binaryPrice(sortedProducts, 800))
+
+// bagian 8.1
+function bubbleSort(numbers) {
+    const arr = [...numbers];
+    for (let i = 0; i < arr.length - 1; i++) {
+        for (let j = 0; j < arr.length - 1 - i; j++) {
+            if (arr[j] > arr[j + 1]) {
+                [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
+            }
+        }
+    }
+    return arr;
+}
+
+// bagian 8.2
+function sortProducts(productss, sortBy) {
+        const result = [...productss]
+        if (sortBy === "price-asc") {
+            return result.sort((a, b) => a.price - b.price)
+        } else if (sortBy === "price-desc") {
+            return result.sort((a, b) => b.price - a.price)
+        } else if (sortBy === "rating") {
+            return result.sort((a, b) => b.rating - a.rating)
+        } else if (sortBy === "title") {
+            return result.sort((a, b) => a.title.localeCompare(b.title))
+        }
+        
+        return result;
+}
+console.log("Sort harga termurah: ", sortProducts(productss, "price-asc"))
+console.log("Sort nama: ", sortProducts(productss, "title"))
