@@ -151,6 +151,10 @@ console.log("Semua Tag produk: ", semuaTag)
 const semuaCmn = productss.flatMap(p => p.reviews.map(r=> r.comment))
 console.log("Semua komen orang: ", semuaCmn)
 
+
+// HARI SELANJUTNYA
+
+
 // bagian 5.1
 const laptopPrices = productss
     .filter(p => p.category === "laptops")
@@ -265,3 +269,273 @@ function sortProducts(productss, sortBy) {
 }
 console.log("Sort harga termurah: ", sortProducts(productss, "price-asc"))
 console.log("Sort nama: ", sortProducts(productss, "title"))
+
+
+// bagian 9.1
+function groupByCategory(products) {
+    return products.reduce((groups, product) => {
+        const key = product.category;
+        if (!groups[key]) groups[key] = [];
+        groups[key].push(product);
+        return groups;
+    }, {});
+}
+console.log("Grouping kategori: ", groupByCategory(productss));
+
+// bagian 9.2
+const groupedData = groupByCategory(productss);
+console.table(
+    Object.keys(groupedData).map(cat => ({
+        Category: cat,
+        TotalProducts: groupedData[cat].length
+    }))
+);
+
+
+// bagian 10.1
+function countFrequency(array) {
+    return array.reduce((counts, item) => {
+        counts[item] = (counts[item] || 0) + 1;
+        return counts;
+    }, {});
+}
+const kata = ["laptop", "phone", "laptop", "tablet", "phone", "laptop"];
+console.log("Frekuensi kata: ", countFrequency(kata));
+
+// bagian 10.2
+const allTagsProducts = productss.flatMap(p => p.tags);
+console.log("Frekuensi kategori: ", countFrequency(productss.map(p => p.category)));
+console.log("Frekuensi tags: ", countFrequency(allTagsProducts));
+
+
+// bagian 11.1
+const uniqueCategories = [...new Set(productss.map(p => p.category))];
+const uniqueTags = [...new Set(productss.flatMap(p => p.tags))];
+console.log("Kategori unik: ", uniqueCategories);
+console.log("Tags unik: ", uniqueTags);
+
+
+// bagian 12.1
+function buildProductLookup(products) {
+    const productMap = new Map();
+    for (const product of products) {
+        productMap.set(product.id, product);
+    }
+    return productMap;
+}
+const productLookup = buildProductLookup(productss);
+console.log("Lookup ID 1: ", productLookup.get(1));
+
+
+// bagian 13.1, 13.2
+class Stack {
+    constructor() {
+        this.items = [];
+    }
+    push(item) {
+        this.items.push(item);
+    }
+    pop() {
+        return this.items.pop();
+    }
+    peek() {
+        return this.items[this.items.length - 1];
+    }
+    isEmpty() {
+        return this.items.length === 0;
+    }
+}
+const searchHistory = new Stack();
+searchHistory.push("laptop");
+searchHistory.push("phone");
+console.log("Riwayat terakhir (peek): ", searchHistory.peek());
+console.log("Undo pencarian (pop): ", searchHistory.pop());
+
+
+// bagian 14.1
+class Queue {
+    constructor() {
+        this.items = [];
+    }
+    enqueue(item) {
+        this.items.push(item);
+    }
+    dequeue() {
+        return this.items.shift();
+    }
+    peek() {
+        return this.items[0];
+    }
+    isEmpty() {
+        return this.items.length === 0;
+    }
+}
+const requestQueue = new Queue();
+requestQueue.enqueue("Req 1");
+requestQueue.enqueue("Req 2");
+console.log("Antrean paling depan: ", requestQueue.peek());
+console.log("Proses antrean (dequeue): ", requestQueue.dequeue());
+
+
+// bagian 15.1
+const categoriesTree = [
+    {
+        name: "Electronics",
+        children: [
+            { name: "Laptop", children: [] },
+            { name: "Phone", children: [] }
+        ]
+    }
+];
+function printCategories(categories, depth = 0) {
+    for (const category of categories) {
+        console.log(" ".repeat(depth * 2) + category.name);
+        if (category.children.length > 0) {
+            printCategories(category.children, depth + 1);
+        }
+    }
+}
+console.log("Struktur Kategori:");
+printCategories(categoriesTree);
+
+
+// bagian 16.1, 16.2
+function compareSearchSteps(array, target) {
+    let linearSteps = 0;
+    for (let i = 0; i < array.length; i++) {
+        linearSteps++;
+        if (array[i] === target) break;
+    }
+
+    let binarySteps = 0;
+    let left = 0, right = array.length - 1;
+    while (left <= right) {
+        binarySteps++;
+        const mid = Math.floor((left + right) / 2);
+        if (array[mid] === target) break;
+        if (array[mid] < target) left = mid + 1;
+        else right = mid - 1;
+    }
+
+    return { linearSteps, binarySteps };
+}
+const bigArray = Array.from({ length: 10000 }, (_, i) => i + 1);
+console.log("Perbandingan langkah cari 9999: ", compareSearchSteps(bigArray, 9999));
+
+
+// bagian 17.1
+function renderProducts(products) {
+    if (typeof document === "undefined") return; // Skip kalau running di Node.js
+    
+    const container = document.querySelector("#product-list");
+    if (!container) return;
+    container.innerHTML = "";
+    for (const product of products) {
+        const card = document.createElement("div");
+        card.classList.add("product-card");
+        card.innerHTML = `
+            <h3>${product.title}</h3>
+            <p>Harga: $${product.price}</p>
+            <p>Rating: ${product.rating}</p>
+        `;
+        container.append(card);
+    }
+}
+
+
+// bagian 18.1
+const state = {
+    products: [],
+    search: "",
+    category: "all",
+    sortBy: "default",
+    favorites: new Set(),
+    status: "idle"
+};
+
+function render() {
+    let filtered = [...state.products];
+    if (state.search) {
+        filtered = filtered.filter(p => p.title.toLowerCase().includes(state.search.toLowerCase()));
+    }
+    if (state.category !== "all") {
+        filtered = filtered.filter(p => p.category === state.category);
+    }
+    renderProducts(filtered);
+}
+
+
+// bagian 19.1
+if (typeof document !== "undefined") {
+    const searchInput = document.querySelector("#search-input");
+    if (searchInput) {
+        searchInput.addEventListener("input", (e) => {
+            state.search = e.target.value;
+            render();
+        });
+    }
+}
+
+
+// bagian 20.1
+function getStatisticsRefactored(products) {
+    const prices = products.map(p => p.price);
+    const totalProducts = products.length;
+    const totalStock = products.reduce((sum, p) => sum + p.stock, 0);
+    const averagePrice = prices.reduce((a, b) => a + b, 0) / (totalProducts || 1);
+    
+    return {
+        totalProducts,
+        averagePrice,
+        highestPrice: Math.max(...prices),
+        lowestPrice: Math.min(...prices),
+        totalStock
+    };
+}
+
+
+// bagian 22.1
+const checkDataPromise = new Promise((resolve, reject) => {
+    const success = true;
+    if (success) resolve("Data berhasil dimuat");
+    else reject("Gagal memuat data");
+});
+checkDataPromise
+    .then(res => console.log("Promise result: ", res))
+    .catch(err => console.error(err));
+
+
+// bagian 23.1, 24.1
+async function fetchProductsFromAPI() {
+    try {
+        state.status = "loading";
+        const response = await fetch("https://dummyjson.com/products?limit=30");
+        if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
+        const data = await response.json();
+        state.products = data.products;
+        state.status = "success";
+        console.log("Data Fetch berhasil:", state.products);
+    } catch (error) {
+        state.status = "error";
+        console.error("Gagal Fetch data: ", error);
+    } finally {
+        render();
+    }
+}
+
+
+// bagian 25.1, 25.2, 25.3
+function partialSearch(products, keyword) {
+    const lower = keyword.toLowerCase();
+    return products.filter(p => p.title.toLowerCase().includes(lower));
+}
+console.log("Partial search 'phone': ", partialSearch(productss, "phone"));
+
+
+// bagian 26 (Aplikasi Akhir Orchestration)
+function initApp() {
+    state.products = [...productss];
+    render();
+    console.log("App berhasil di-init!");
+}
+initApp();
