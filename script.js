@@ -536,6 +536,6 @@ console.log("Partial search 'phone': ", partialSearch(productss, "phone"));
 function initApp() {
     state.products = [...productss];
     render();
-    console.log("App berhasil di-init!");
+    console.log("App berhasil di init!");
 }
 initApp();
